@@ -1,6 +1,6 @@
 {
   "name": "node-red-contrib-meshblu",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "node red node for connecting to meshblu (skynet)",
   "main": "meshblu.js",
   "scripts": {

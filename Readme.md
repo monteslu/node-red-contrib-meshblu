@@ -12,7 +12,7 @@ npm node-red-contrib-meshblu
 
 ## Usage
 
-You can connect to any meshblu server, and use that for subscribe to messages and sending output.
+You can connect to any meshblu server, and use that for subscribing to messages and sending output.
 
 ## Screenshot
 
