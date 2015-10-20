@@ -1,4 +1,4 @@
-var skynet = require('skynet');
+var skynet = require('meshblu');
 var _ = require('lodash');
 
 var rest = require('rest');
