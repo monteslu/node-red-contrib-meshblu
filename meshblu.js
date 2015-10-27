@@ -190,10 +190,26 @@ function init(RED) {
 
   RED.nodes.registerType("meshblu out",meshbluOutNode);
 
+  function handleRoute(req, res, handler){
+    handler(req.query)
+      .then(function(data){
+        res.send(data);
+      }, function(err){
+        console.log('error in meshblu request', err);
+        res.send(500);
+      });
+  }
   //routes
-  RED.httpAdmin.get("/meshblu/register", register);
-  RED.httpAdmin.get("/meshblu/getDevices", getDevices);
-  RED.httpAdmin.get("/meshblu/claim", claim);
+  RED.httpAdmin.get("/meshblu/register", function(req, res){
+    handleRoute(req, res, register);
+  });
+
+  RED.httpAdmin.get("/meshblu/getDevices", function(req, res){
+    handleRoute(req, res, getDevices);
+  });
+  RED.httpAdmin.get("/meshblu/claim", function(req, res){
+    handleRoute(req, res, claim);
+  });
 
 }
 
