@@ -1,4 +1,4 @@
-var skynet = require('skynet');
+var meshblu = require('meshblu');
 var _ = require('lodash');
 
 var when = require('when');
@@ -22,21 +22,21 @@ function isBroadcast(data){
 function init(RED) {
 
   function meshbluserverNode(n) {
-    RED.nodes.createNode(this,n);
-    this.server = n.server;
-    this.port = n.port;
-    this.uuid = n.uuid;
-    this.token = n.token;
+    var self = this;
+    RED.nodes.createNode(self,n);
+    self.server = n.server || 'meshblu.octoblu.com';
+    self.port = n.port || 80;
+    self.uuid = n.uuid;
+    self.token = n.token;
 
     var options = {
-      server: this.server,
-      port: this.port,
-      uuid: this.uuid,
-      token: this.token
+      server: self.server,
+      port: self.port,
+      uuid: self.uuid,
+      token: self.token
     };
-    this.conn = skynet.createConnection(options);
+    self.conn = meshblu.createConnection(options);
 
-    var self = this;
     self.directs = [];
     self.subs = [];
 
@@ -67,7 +67,7 @@ function init(RED) {
 
     self.conn.on('message', function(data, fn){
       if(data.devices){
-        if(!Array.isArray(data.devices)){
+        if(!_.isArray(data.devices)){
           data.devices = [data.devices];
         }
         if(isBroadcast(data)){
@@ -81,7 +81,6 @@ function init(RED) {
             direct.send(data);
           });
         }
-
       }
     });
 
@@ -107,27 +106,28 @@ function init(RED) {
   RED.nodes.registerType("meshblu-server", meshbluserverNode);
 
   function meshbluInNode(n) {
-    RED.nodes.createNode(this,n);
-    this.topic = n.topic;
-    this.server = n.server;
-    this.serverConfig = RED.nodes.getNode(this.server);
-    this.directToMe = n.directToMe;
-    this.uuid = n.uuid;
+    var self = this;
+    RED.nodes.createNode(self,n);
+    self.topic = n.topic;
+    self.server = n.server;
+    self.serverConfig = RED.nodes.getNode(self.server);
+    self.directToMe = n.directToMe;
+    self.uuid = n.uuid;
   }
   RED.nodes.registerType("meshblu in",meshbluInNode);
 
   function meshbluOutNode(n) {
-    RED.nodes.createNode(this,n);
-    this.server = n.server;
-    this.serverConfig = RED.nodes.getNode(this.server);
-    this.broadcast = n.broadcast;
-    this.uuid = n.uuid;
-    this.forwards = n.forwards;
     var self = this;
+    RED.nodes.createNode(self,n);
+    self.server = n.server;
+    self.serverConfig = RED.nodes.getNode(self.server);
+    self.broadcast = n.broadcast;
+    self.uuid = n.uuid;
+    self.forwards = n.forwards;
 
-    if (this.serverConfig) {
-      var node = this;
-      this.on("input",function(msg) {
+    if (self.serverConfig) {
+      var node = self;
+      self.on("input",function(msg) {
         if(!msg.devices){
           if(self.broadcast){
             msg.devices = ['*'];
@@ -184,33 +184,16 @@ function init(RED) {
 
       });
     } else {
-      this.error("missing server configuration");
+      self.error("missing server configuration");
     }
   }
 
   RED.nodes.registerType("meshblu out",meshbluOutNode);
 
-  function handleRoute(req, res, handler){
-    handler(req.query)
-      .then(function(data){
-        res.send(data);
-      }, function(err){
-        console.log('error in meshblu request', err);
-        res.send(500);
-      });
-  }
   //routes
-  RED.httpAdmin.get("/meshblu/register", function(req, res){
-    handleRoute(req, res, register);
-  });
-
-  RED.httpAdmin.get("/meshblu/getDevices", function(req, res){
-    handleRoute(req, res, getDevices);
-  });
-  RED.httpAdmin.get("/meshblu/claim", function(req, res){
-    handleRoute(req, res, claim);
-  });
-
+  RED.httpAdmin.get("/meshblu/register", register);
+  RED.httpAdmin.get("/meshblu/getDevices", getDevices);
+  RED.httpAdmin.get("/meshblu/claim", claim);
 }
 
 module.exports = init;
