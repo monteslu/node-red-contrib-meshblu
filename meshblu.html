@@ -22,6 +22,18 @@
     <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
     <input type="text" id="node-input-name" placeholder="Name">
   </div>
+  <div id="uuidListDialog" title="Searching devices..." class="hide">
+    <div class="form-row">
+      <span id="serverName"></span>
+    </div>
+    <div class="form-row">
+      <select id="uuidDevices" size="7" style="width:50em; font-family:  Courier, monospace;">
+      </select>
+    </div>
+    <div class="form-row">
+      <a id="node-input-claim-uuid" class="btn" style="display: none;">claim</a> <span id="claimOutput"> </span>
+    </div>
+  </div>
 </script>
 
 <script type="text/x-red" data-help-name="meshblu in">
@@ -75,6 +87,8 @@
                 token: server.token
               },
               success: function(data){
+
+                console.log('getDevices', data);
 
                 $('#node-input-lookup-uuid-icon').attr('class', 'icon icon-search');
 
