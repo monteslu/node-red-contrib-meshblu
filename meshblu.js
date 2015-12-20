@@ -51,7 +51,7 @@ function init(RED) {
               self.directs.push(mnode);
             }else{
               self.subs.push(mnode);
-              self.conn.subscribe({ uuid: mnode.uuid }, function(err){
+              self.conn.subscribe({ uuid: mnode.uuid, types: ['broadcast'] }, function(err){
                 console.log('subscribed to', mnode.uuid, err);
               });
             }
