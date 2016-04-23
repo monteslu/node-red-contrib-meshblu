@@ -64,7 +64,7 @@ function init(RED) {
       }catch(exp){
         console.log('error calling alternateMethod', name, msg, exp);
       }
-    }
+    };
   }
   RED.nodes.registerType("meshblu-server", meshbluserverNode);
 
@@ -89,11 +89,11 @@ function init(RED) {
       }
 
       conn.on('message', function(data, fn){
-        if(isBroadcast(data)){
+        if(!self.directToMe && isBroadcast(data)){
           if(self.uuid === data.fromUuid){
             self.send(data);
           }
-        }else{
+        }else if(self.directToMe && !isBroadcast(data)){
           self.send(data);
         }
       });
