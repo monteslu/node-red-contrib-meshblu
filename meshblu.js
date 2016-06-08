@@ -40,7 +40,7 @@ function init(RED) {
     self.directs = [];
     self.subs = [];
 
-    self.conn.once('ready', function(data){
+    self.conn.on('ready', function(data){
       self.conn.connected = true;
       self.emit('connReady', self.conn);
     });
@@ -87,17 +87,16 @@ function init(RED) {
           console.log('subscribed to', self.uuid, err);
         });
       }
+    });
 
-      conn.on('message', function(data, fn){
-        if(!self.directToMe && isBroadcast(data)){
-          if(self.uuid === data.fromUuid){
-            self.send(data);
-          }
-        }else if(self.directToMe && !isBroadcast(data)){
+    self.serverConfig.conn.on('message', function(data, fn){
+      if(!self.directToMe && isBroadcast(data)){
+        if(self.uuid === data.fromUuid){
           self.send(data);
         }
-      });
-
+      }else if(self.directToMe && !isBroadcast(data)){
+        self.send(data);
+      }
     });
 
     self.serverConfig.on('connError', function(err){
